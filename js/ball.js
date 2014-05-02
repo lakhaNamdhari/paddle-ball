@@ -7,62 +7,101 @@
  ************/
 
 (function( ns ){
-  var util = ns.utility || null;
+	var utils = ns.utils,
+		constants = ns.constants;
   
-  //check dependencies
-  if ( !util ){
-    throw("Missing_Dependency for PB.Ball");
-  }
-  
-  ns.Ball = function( attr ){
-	//self invoking constructor
-	if ( !( this instanceof ns.ball ) ){
-		new ns.Ball( attr );
+	//checking dependencies
+	if ( !createjs ){
+		throw( "MISSING_DEPENDENCY" + " :CreateJS" );
 	}
 	
-	//Ball's properties
-	this.data = attr || {};
+	ns.Ball = function( attr ){
+		utils.log( "Ball.constructor() called" );
+		
+		this.data = attr || {};
+		
+		this.init();
+	};
 	
-	//Ball's Speed ( pixel / second )
-	this.data.speed = typeof this.data.speed === "number" && this.data.speed || 200;
+	// Inherit from Shape
+	ns.Ball.prototype = new createjs.Shape();
 	
-	//Ball's length ( diameter )
-	this.data.length = typeof this.data.length === "number" && this.data.length || 20;
+	// Initialise the Ball object
+	ns.Ball.prototype.init = function(){
+		utils.log( "Ball.init() called" );
+		
+		// The inital angle at which ball will move
+		this.angle = this.data.angle || 135;
+		
+		// Speed for ball ( in pixels / sec )
+		this.speed = this.data.speed || 350;
+		
+		// Movement direction for ball - can be Clockwise / Anti-clockwise
+		this.direction = this.data.direction || constants.DIRECTION.clockwise;
+		
+		// Ball's color
+		this.color = this.data.color || "#FF0000";
+		
+		// Ball's radius		
+		this.radius = this.data.radius || 15;
+		
+		// Sets Ball position on X-axis
+		this.x = this.data.x || 0;
+		
+		// Sets Balls position on Y-axis
+		this.y = this.data.y || 0;
+		
+		// Create Ball
+		this.graphics.beginFill( this.color ).drawCircle( 0, 0, this.radius );
+	};
 	
-	//Ball's color
-	this.data.color = typeof this.data.color === "string" && this.data.color || "#ff0000";
-	
-	//Ball's center X-axis cordinates
-	this.data.x = typeof this.data.x === "number" && this.data.x || 0;
+	// To move ball
+	ns.Ball.prototype.move = function( delta ){
+		utils.log( "Ball.move() called" );
+		
+		var angleInRadians = this.angle / 180 * Math.PI;
+		
+		//movement in pixels
+		var r = delta && delta / 1000 * this.speed;
+		
+		// Multipliers to transform Geometry cordinates to screen cordinates
+		var dx = 1, dy = -1;
+		
+		//move ball
+		this.x += dx * r *  Math.cos( angleInRadians );
+		this.y += dy * r *  Math.sin( angleInRadians );
 
-	//Ball's center Y-axis cordinates
-	this.data.y = typeof this.data.y === "number" && this.data.y || 0;
+	};
 	
-	//Ball's direction ( angle of movement )
-	this.data.direction = typeof this.data.direction === "number" && this.data.direction || 135;
-  };
-  
-  ns.Ball.prototype = {
-	//It initiates Ball movement
-	move: function(){
-	  util.log("PB.Ball.move");
-	  
-	  
-	},
+	// To change balls direction
+	ns.Ball.prototype.bounce = function( angle ){
+		utils.log( "Ball.bounce() called" );
+		
+		//process only valid param
+		if ( typeof angle === "number" && ( angle >= 0 && angle <= 360 ) ){
+			this.angle = angle;
+		}
+		else {
+			//reflect existing angle
+			//For Clock wise movement
+			if ( this.direction === constants.DIRECTION.clockwise ){
+				this.angle -= 90;
+				
+				//For boundary condition
+				if ( this.angle < 0 ){
+					this.angle = 360 + this.angle;
+				} 
+			}
+			//For anti-clockwise movement
+			else {
+				this.angle += 90;
+				
+				//For boundary condition
+				if ( this.angle > 360 ){
+					this.angle = 360 - this.angle;
+				}
+			}
+		}
+	};	
 	
-	//It changes the angle of movement for ball
-	bounce: function(){
-	  util.log("PB.Ball.bounce");
-	  
-	  
-	},
-	
-	//Stops ball movement
-	stop: function(){
-	  util.log("PB.Ball.stop");
-	  
-	  
-	}
-  };
-  
-}( window.PB || {} )):
+}( window.PB ));
