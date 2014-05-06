@@ -45,14 +45,6 @@
 		// Pedal's Height		
 		this.height = this.data.height || 10;
 		
-		// Pedals vertical position
-		// TODO: default should be calc dynamically
-		this.y = this.data.y || 550;
-		
-		// Pedals horizontan positio
-		// TODO: Default should be in mid;
-		this.x = this.data.x || 150;
-		
 		// Width of pedal's container
 		this.trackLength = this.data.trackLength || 1000;
 		//accounting for Pedals Length, so it always remains visible

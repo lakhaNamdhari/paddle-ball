@@ -17,7 +17,8 @@
 		throw( "MISSING_DEPENDENCY" + " : Root Namespace." );
 	}
 	
-	var constants = ns.constants;
+	var constants = ns.constants,
+		utils = ns.utils;
 	
 	ns.GameManager = function( stage ){
 		utils.log( "PB.GameManager() called" );
@@ -42,8 +43,10 @@
 			utils.log( "PB.GameManager.init() called" );
 			
 			this.initElements();
+			this.bindEvents();
 		},
 		
+		// Sets initial position for Game elements
 		initElements: function(){
 			utils.log( "PB.GameManager.initElements() called" );
 			
@@ -60,15 +63,51 @@
 				}
 			}
 			
-			// Ball boundaries
+			// Game boundaries
 			this.bounds = {};
-			this.bounds.left = 0;
-			this.bounds.right = this.stage.canvas.width;
-			this.bounds.top = 0;
+			this.bounds.start = {
+				x: 0,
+				y: 0
+			};
+			this.bounds.end = { 
+				x: this.stage.canvas.width,
+			};
+
+			// Frame rate for game
+			this.fps = 60;
 			
+			// Sets Game Frame rate
+			createjs.Ticker.setFPS( this.fps );
+			
+			// Set initial position for Ball
+			this.ball.x = this.stage.canvas.width / 2;
+			this.ball.y = this.stage.canvas.height - 15;
+			
+			// Set horizontal position for Pedal ( center )
+			this.pedal.x = this.stage.canvas.width / 2 - this.pedal.length / 2;
+			
+			// Set verticle position for Pedal ( 50px from bottom )
+			this.pedal.y = this.stage.canvas.height - 50;			
+		},
+		
+		// Bind all Events here
+		bindEvents: function(){
+			utils.log( "PB.GameManager.bindEvents() called" );
+			
+			createjs.Ticker.on( "tick", this.hRenderGame, this );
+		},
+		
+		// Game Loop
+		hRenderGame: function( e ){
+			// Moves Ball
+			this.ball.move( e.delta );
+			
+			// Moves Pedal
+			this.pedal.move( this.stage.mouseX );
+			
+			//render
+			this.stage.update();
 		}
-		
-		
 	}; 
 	
 }( window.PB = window.PB ));
