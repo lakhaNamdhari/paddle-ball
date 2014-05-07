@@ -99,4 +99,21 @@
 		}
 	};
 
+	// Calculates ball's bounce angle based on its local point which is hit
+	ns.Pedal.prototype.bounceAngle = function( point ){
+		utils.log( "PB.Pedal.bounceAngle() called" );
+		
+		var angle = {
+			start: 30,
+			end: 150
+		},
+		angleMagnitude = angle.end - angle.start;
+		
+		// Angle corrosponding to 1px
+		var dx = angleMagnitude / this.length;
+		
+		// returns bounce angle in degree
+		return angle.start + Math.round( point.x * dx );
+	};
+
 }( window.PB ));

@@ -43,7 +43,7 @@
 		this.color = this.data.color || "#ffa500";
 		
 		// Ball's radius		
-		this.radius = this.data.radius || 30;
+		this.radius = this.data.radius || 10;
 		
 		// Sets Ball position on X-axis
 		this.x = this.data.x || 0;
