@@ -16,7 +16,7 @@
 	}
 	
 	ns.Ball = function( attr ){
-		utils.log( "Ball.constructor() called" );
+		utils.log( "PB.Ball.constructor() called" );
 		
 		this.data = attr || {};
 		
@@ -28,7 +28,7 @@
 	
 	// Initialise the Ball object
 	ns.Ball.prototype.init = function(){
-		utils.log( "Ball.init() called" );
+		utils.log( "PB.Ball.init() called" );
 		
 		// The inital angle at which ball will move
 		this.angle = this.data.angle || 135;
@@ -40,10 +40,10 @@
 		this.direction = this.data.direction || constants.DIRECTION.clockwise;
 		
 		// Ball's color
-		this.color = this.data.color || "#FF0000";
+		this.color = this.data.color || "#ffa500";
 		
 		// Ball's radius		
-		this.radius = this.data.radius || 15;
+		this.radius = this.data.radius || 10;
 		
 		// Sets Ball position on X-axis
 		this.x = this.data.x || 0;
@@ -51,13 +51,20 @@
 		// Sets Balls position on Y-axis
 		this.y = this.data.y || 0;
 		
+		// Flag indicated is ball is at rest
+		this.stopped = true;
+		
 		// Create Ball
 		this.graphics.beginFill( this.color ).drawCircle( 0, 0, this.radius );
 	};
 	
 	// To move ball
 	ns.Ball.prototype.move = function( delta ){
-		utils.log( "Ball.move() called" );
+		utils.log( "PB.Ball.move() called" );
+		
+		if ( this.stopped ){
+			return false;
+		}
 		
 		var angleInRadians = this.angle / 180 * Math.PI;
 		
@@ -75,7 +82,7 @@
 	
 	// To change balls direction
 	ns.Ball.prototype.bounce = function( angle ){
-		utils.log( "Ball.bounce() called" );
+		utils.log( "PB.Ball.bounce() called" );
 		
 		//process only valid param
 		if ( typeof angle === "number" && ( angle >= 0 && angle <= 360 ) ){
@@ -103,5 +110,16 @@
 			}
 		}
 	};	
+	
+	// To Stop moving ball
+	ns.Ball.prototype.stop = function( flag ){
+		utils.log( "PB.Ball.stop() called" );
+		
+		if ( typeof flag === "boolean" && !flag){
+			this.stopped = false;
+		}else {
+			this.stopped = true;
+		}
+	}
 	
 }( window.PB ));

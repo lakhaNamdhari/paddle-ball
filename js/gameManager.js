@@ -72,22 +72,20 @@
 			this.bounds.end = { 
 				x: this.stage.canvas.width,
 			};
-
-			// Frame rate for game
-			this.fps = 60;
 			
-			// Sets Game Frame rate
-			createjs.Ticker.setFPS( this.fps );
+			// Distance from bottom at which Bann & Pedal will be placed on start
+			this.placement = 50;
 			
-			// Set initial position for Ball
-			this.ball.x = this.stage.canvas.width / 2;
-			this.ball.y = this.stage.canvas.height - 15;
-			
+			// Using RAF api over setInterval ( for Performance )
+			createjs.Ticker.timingMode = createjs.Ticker.RAF;
+						
 			// Set horizontal position for Pedal ( center )
 			this.pedal.x = this.stage.canvas.width / 2 - this.pedal.length / 2;
-			
-			// Set verticle position for Pedal ( 50px from bottom )
-			this.pedal.y = this.stage.canvas.height - 50;			
+			// Set verticle position for Pedal
+			this.pedal.y = this.stage.canvas.height - this.placement;
+
+			// Attach ball to pedal
+			this.pedal.attach( this.ball );
 		},
 		
 		// Bind all Events here
@@ -95,18 +93,51 @@
 			utils.log( "PB.GameManager.bindEvents() called" );
 			
 			createjs.Ticker.on( "tick", this.hRenderGame, this );
+			this.stage.canvas.addEventListener( "click", this.hStartGame.bind( this ) );
 		},
 		
 		// Game Loop
 		hRenderGame: function( e ){
+			utils.log( "PB.GameManager.hRenderGame() called" );
+			
 			// Moves Ball
 			this.ball.move( e.delta );
 			
 			// Moves Pedal
 			this.pedal.move( this.stage.mouseX );
 			
+			// Watches ball movement
+			this.watchBall();
+			
 			//render
 			this.stage.update();
+		},
+
+		// Starts the Game
+		hStartGame: function( e ){
+			utils.log( "PB.GameManager.hStartGame() called" );
+			//alert("");
+			console.log(this);
+			// Detaches Ball from pedal
+			this.pedal.detach();
+		},
+		
+		// Watches ball movement - for boundary violation and hitting against Objects
+		watchBall: function(){
+			utils.log( "PB.GameManager.watchBall() called" );
+			
+			var point;
+			
+			// Test Boundary Violation
+			if ( (this.ball.x - this.ball.radius) <= this.bounds.start.x || (this.ball.y - this.ball.radius) <= this.bounds.start.y || (this.ball.x + this.ball.radius) >= this.bounds.end.x ){
+				this.ball.bounce();
+			}
+			
+			// Test hitting against Pedal
+			point = this.ball.localToLocal( 0, this.ball.radius, this.pedal );
+			if ( this.pedal.hitTest( point.x, point.y) ){
+				this.ball.bounce();
+			}
 		}
 	}; 
 	

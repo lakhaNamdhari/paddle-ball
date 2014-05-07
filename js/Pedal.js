@@ -37,7 +37,7 @@
 		utils.log( "Pedal.initElements() called" );
 		
 		// Pedal's color
-		this.color = this.data.color || "#00FF00";
+		this.color = this.data.color || "#0096fd";
 		
 		// Pedal's Length		
 		this.length = this.data.length || 100;
@@ -62,7 +62,41 @@
 		xPos -= this.length / 2;
 		
 		// Normalizing for Min-Max boundaries
-		this.x = xPos > this.trackLength ? this.trackLength : ( ( xPos < 0 ) ? 0 : xPos );				
+		this.x = xPos > this.trackLength ? this.trackLength : ( ( xPos < 0 ) ? 0 : xPos );		
+
+		if ( this.attached ){
+			this.attached.x = this.x + this.length / 2;
+		}
+	};
+	
+	// Attaches Ball to its center, in a way that ball moves along with pedal
+	ns.Pedal.prototype.attach = function( ball ){
+		utils.log( "Pedal.attach() called" );
+		
+		if ( !(ball && ball instanceof ns.Ball) ){
+			return false;
+		}
+		
+		// Stop moving Ball
+		ball.stop();
+		
+		this.attached = ball;
+		
+		//Position ball at the center of pedal
+		ball.y = this.y - ball.radius;
+		ball.x = this.x + this.length / 2;		
+	};
+	
+	// To detach object ( ball ) from Pedal
+	ns.Pedal.prototype.detach = function(){
+		utils.log( "PB.Pedal.detach() called" );
+		
+		if ( this.attached ){
+			// Move Ball
+			this.attached.stop( false );
+			
+			this.attached = null;
+		}
 	};
 
 }( window.PB ));
