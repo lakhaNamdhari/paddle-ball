@@ -37,13 +37,13 @@
 		this.speed = this.data.speed || 350;
 		
 		// Movement direction for ball - can be Clockwise / Anti-clockwise
-		this.direction = this.data.direction || constants.DIRECTION.clockwise;
+		this.direction = this.data.direction || constants.DIRECTION.CLOCKWISE;
 		
 		// Ball's color
 		this.color = this.data.color || "#ffa500";
 		
 		// Ball's radius		
-		this.radius = this.data.radius || 10;
+		this.radius = this.data.radius || 30;
 		
 		// Sets Ball position on X-axis
 		this.x = this.data.x || 0;
@@ -62,6 +62,7 @@
 	ns.Ball.prototype.move = function( delta ){
 		utils.log( "PB.Ball.move() called" );
 		
+		// Coz stopped Ball can't move :)
 		if ( this.stopped ){
 			return false;
 		}
@@ -84,18 +85,27 @@
 	ns.Ball.prototype.bounce = function( angle ){
 		utils.log( "PB.Ball.bounce() called" );
 		
+		var helper;
+		
+		// Coz stopped Ball can't move :)
+		if ( this.stopped ){
+			return false;
+		}
+		
 		//process only valid param
 		if ( typeof angle === "number" && ( angle >= 0 && angle <= 360 ) ){
 			this.angle = angle;
 		}
-		else {
+		else {		
+			//console.log( this.angle );
+		
 			//reflect existing angle
 			//For Clock wise movement
-			if ( this.direction === constants.DIRECTION.clockwise ){
+			if ( this.direction === constants.DIRECTION.CLOCKWISE ){
 				this.angle -= 90;
 				
 				//For boundary condition
-				if ( this.angle < 0 ){
+				if ( this.angle <= 0 ){
 					this.angle = 360 + this.angle;
 				} 
 			}
@@ -104,10 +114,11 @@
 				this.angle += 90;
 				
 				//For boundary condition
-				if ( this.angle > 360 ){
-					this.angle = 360 - this.angle;
+				if ( this.angle >= 360 ){
+					this.angle = this.angle - 360;
 				}
 			}
+			
 		}
 	};	
 	

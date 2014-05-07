@@ -65,13 +65,10 @@
 			
 			// Game boundaries
 			this.bounds = {};
-			this.bounds.start = {
-				x: 0,
-				y: 0
-			};
-			this.bounds.end = { 
-				x: this.stage.canvas.width,
-			};
+			this.bounds.BOTTOM = this.stage.canvas.height;
+			this.bounds.LEFT = 0;
+			this.bounds.TOP = 0;
+			this.bounds.RIGHT = this.stage.canvas.width;
 			
 			// Distance from bottom at which Bann & Pedal will be placed on start
 			this.placement = 50;
@@ -84,8 +81,15 @@
 			// Set verticle position for Pedal
 			this.pedal.y = this.stage.canvas.height - this.placement;
 
+			// Set Ball's Speed
+			this.ball.speed = 150;
+			//this.ball.radius = 100;
+			
 			// Attach ball to pedal
 			this.pedal.attach( this.ball );
+			
+			//
+			this.ballPrevBound = constants.BOUND.BOTTOM;
 		},
 		
 		// Bind all Events here
@@ -108,7 +112,7 @@
 			
 			// Watches ball movement
 			this.watchBall();
-			
+						
 			//render
 			this.stage.update();
 		},
@@ -122,23 +126,72 @@
 			this.pedal.detach();
 		},
 		
-		// Watches ball movement - for boundary violation and hitting against Objects
+		// Watches ball movement - for Boundary-Pedal-Bricks hit
 		watchBall: function(){
 			utils.log( "PB.GameManager.watchBall() called" );
 			
-			var point;
+			var point,
+				ballPrevBound = this.ballPrevBound,
+				hit = false;
 			
-			// Test Boundary Violation
-			if ( (this.ball.x - this.ball.radius) <= this.bounds.start.x || (this.ball.y - this.ball.radius) <= this.bounds.start.y || (this.ball.x + this.ball.radius) >= this.bounds.end.x ){
-				this.ball.bounce();
+			// Test Ball HIT
+			// BOTTOM Boundary
+			if ( this.ball.y + this.ball.radius >= this.bounds.BOTTOM ){
+				this.ballPrevBound = constants.BOUND.BOTTOM;
+				hit = true;
 			}
 			
+			// LEFT Boundary
+			else if ( this.ball.x - this.ball.radius <= this.bounds.LEFT ){
+				this.ballPrevBound = constants.BOUND.LEFT;
+				hit = true;
+			}
+
+			// TOP Boundary
+			else if ( this.ball.y - this.ball.radius <= this.bounds.TOP ){
+				this.ballPrevBound = constants.BOUND.TOP;
+				hit = true;
+			}
+
+			// RIGHT Boundary
+			else if ( this.ball.x + this.ball.radius >= this.bounds.RIGHT ){
+				this.ballPrevBound = constants.BOUND.RIGHT;
+				hit = true;
+			}
+			
+			// If Ball is Hit
+			if ( hit ){			
+				// Test if Ball's rotation needs to be Flipped ( Clockwise / Anti-clockwise )
+				// For Clockwise moving Ball
+				if ( this.ball.direction === constants.DIRECTION.CLOCKWISE && ((ballPrevBound + 1) % 4) !== this.ballPrevBound ){
+					this.ball.direction = 1 - this.ball.direction;
+				}
+
+				// For Anti-Clockwise moving Ball
+				else if ( this.ball.direction === constants.DIRECTION.ANTICLOCKWISE && ( ( (ballPrevBound - 1) < 0 ) ? constants.BOUND.RIGHT : (ballPrevBound - 1) ) !== this.ballPrevBound ){
+					this.ball.direction = 1 - this.ball.direction;
+				}
+							
+				console.log( this.ball.direction );
+				
+				// Change its movement angle
+				this.ball.bounce();
+			}
+
+			/*
+			if ( (this.ball.x - this.ball.radius) <= this.bounds.start.x || (this.ball.y - this.ball.radius) <= this.bounds.start.y || (this.ball.x + this.ball.radius) >= this.bounds.end.x || (this.ball.y + this.ball.radius) >= this.bounds.end.y ){
+				this.ball.bounce();
+			}
+			*/
+			
+			/*
 			// Test hitting against Pedal
 			point = this.ball.localToLocal( 0, this.ball.radius, this.pedal );
 			if ( this.pedal.hitTest( point.x, point.y) ){
 				this.ball.bounce();
 			}
+			*/
 		}
-	}; 
+	}
 	
 }( window.PB = window.PB ));
