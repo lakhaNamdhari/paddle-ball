@@ -40,7 +40,7 @@
 		this.color = this.data.color || "#0096fd";
 		
 		// Pedal's Length		
-		this.length = this.data.length || 100;
+		this.length = this.data.length || 850;
 
 		// Pedal's Height		
 		this.height = this.data.height || 10;
@@ -104,8 +104,8 @@
 		utils.log( "PB.Pedal.bounceAngle() called" );
 		
 		var angle = {
-			start: 30,
-			end: 150
+			start: 40,
+			end: 140
 		},
 		angleMagnitude = angle.end - angle.start;
 		
@@ -113,7 +113,7 @@
 		var dx = angleMagnitude / this.length;
 		
 		// returns bounce angle in degree
-		return angle.start + Math.round( point.x * dx );
+		return angle.end - Math.round( point.x * dx );
 	};
 
 }( window.PB ));

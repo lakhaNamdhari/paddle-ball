@@ -86,11 +86,17 @@
 			
 			createjs.Ticker.on( "tick", this.hRenderGame, this );
 			this.stage.canvas.addEventListener( "click", this.hStartGame.bind( this ) );
+			document.getElementById("pause").addEventListener("click", this.hPause );
 		},
 		
 		// Game Loop
 		hRenderGame: function( e ){
 			utils.log( "PB.GameManager.hRenderGame() called" );
+			
+			// If Ticker Paused dont act
+			if ( createjs.Ticker.getPaused()){
+				return false;
+			}
 			
 			// Moves Ball
 			this.ball.move( e.delta );
@@ -111,6 +117,19 @@
 
 			// Detaches Ball from pedal
 			this.pedal.detach();
+		},	
+
+		// Pauses the Game
+		hPause: function( e ){
+			utils.log( "PB.GameManager.hPause() called" );
+			
+			if ( !this.paused ){
+				createjs.Ticker.setPaused( true );
+				this.paused = true;
+			}else {
+				createjs.Ticker.setPaused( false );
+				this.paused = false;
+			}
 		},
 		
 		// Watches ball movement - for Boundary-Pedal-Bricks Hit and Game-over use case
@@ -133,6 +152,15 @@
 			// Flag Indicates ig ball has hit any object
 			var hit = false;
 			
+			/*
+			// Test for hitting Corners
+			if ( this.ball.x - this.ball.radius <= this.bounds.LEFT && this.ball.y - this.ball.radius <= this.bounds.TOP ){
+				this.ball.bounce( 200 );
+				this.ball.direction = constants.DIRECTION.ANTICLOCKWISE;
+				return false;
+			}
+			*/
+			
 			// Test Ball HIT Object			
 			// LEFT Boundary
 			if ( this.ball.x - this.ball.radius <= this.bounds.LEFT ){
@@ -151,12 +179,29 @@
 				this.ballPrevBound = constants.BOUND.RIGHT;
 				hit = true;
 			}
-			
-			// Hit Pedal
-			else if ( this.pedal.hitTest( point.x, point.y) ){
+/*
+			// BOTTOM Boundary
+			else if ( this.ball.y + this.ball.radius >= this.bounds.BOTTOM ){
 				this.ballPrevBound = constants.BOUND.BOTTOM;
 				hit = true;
-				//bounceAngle = this.pedal.bounceAngle( point );
+			}
+*/
+			// Hit Pedal
+			else if ( this.pedal.hitTest( point.x, point.y) ){
+				this.ballPrevBound = constants.BOUND.BOTTOM;		
+				hit = true;
+				/*				
+				bounceAngle = this.pedal.bounceAngle( point );
+				//console.log( bounceAngle );
+				if ( bounceAngle > 90 ){
+					this.ball.direction = constants.DIRECTION.CLOCKWISE;
+				}else {
+					this.ball.direction = constants.DIRECTION.ANTICLOCKWISE;
+				}
+				console.log( this.ball.direction === 0 ? "P-CLOCKWISE" : "P-ANTICLOCKWISE" );
+				
+				this.ball.bounce( bounceAngle );
+				*/
 			}
 						
 			// Crossing Boundary ( Game-over )
@@ -165,7 +210,7 @@
 			}
 			
 			// If Ball is Hit
-			if ( hit ){			
+			if ( hit ){		
 				// Test if Ball's rotation needs to be Flipped ( Clockwise / Anti-clockwise )
 				// For Clockwise moving Ball
 				if ( this.ball.direction === constants.DIRECTION.CLOCKWISE && ((ballPrevBound + 1) % 4) !== this.ballPrevBound ){
@@ -177,9 +222,9 @@
 					this.ball.direction = 1 - this.ball.direction;
 				}
 							
-				//console.log( this.ball.direction );
+				//console.log( this.ball.direction === 0 ? "CLOCKWISE" : "ANTICLOCKWISE" );
 				// Change its movement angle
-				this.ball.bounce( bounceAngle );
+				this.ball.bounce();
 			}
 		},
 		
@@ -205,7 +250,7 @@
 			this.ball.direction = constants.DIRECTION.CLOCKWISE;
 			
 			// Sets Balls Speed
-			this.ball.speed = 200;
+			this.ball.speed = 2400;
 		}
 	}
 	

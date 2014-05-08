@@ -76,8 +76,8 @@
 		var dx = 1, dy = -1;
 		
 		//move ball
-		this.x += dx * r *  Math.cos( angleInRadians );
-		this.y += dy * r *  Math.sin( angleInRadians );
+		this.x += Math.round( dx * r *  Math.cos( angleInRadians ));
+		this.y += Math.round( dy * r *  Math.sin( angleInRadians ));
 
 	};
 	
@@ -96,9 +96,7 @@
 		if ( typeof angle === "number" && ( angle >= 0 && angle <= 360 ) ){
 			this.angle = angle;
 		}
-		else {		
-			//console.log( this.angle );
-		
+		else {				
 			//reflect existing angle
 			//For Clock wise movement
 			if ( this.direction === constants.DIRECTION.CLOCKWISE ){
@@ -120,6 +118,8 @@
 			}
 			
 		}
+		
+		//console.log( this.angle );
 	};	
 	
 	// To Stop moving ball
